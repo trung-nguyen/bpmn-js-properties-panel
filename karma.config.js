@@ -138,7 +138,10 @@ module.exports = function(karma) {
         modules: [
           'node_modules',
           absoluteBasePath
-        ]
+        ],
+        fallback: {
+          'crypto': false
+        }
       },
       devtool: 'eval-source-map'
     }

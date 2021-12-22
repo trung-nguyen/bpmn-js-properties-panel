@@ -5,6 +5,8 @@ import {
   cleanup
 } from '@testing-library/preact/pure';
 
+import axe from 'axe-core';
+
 import {
   clearBpmnJS,
   setBpmnJS,
@@ -75,7 +77,8 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
       moddleExtensions = {
         zeebe: ZeebeModdle
       },
-      description = {}
+      description = {},
+      layout = {}
     } = options;
 
     clearBpmnJS();
@@ -89,7 +92,8 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
       moddleExtensions,
       propertiesPanel: {
         parent: propertiesContainer,
-        description
+        description,
+        layout
       },
       ...options
     });
@@ -678,6 +682,84 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
       // then
       // fire events
       expect(spy).to.have.been.calledTwice;
+    });
+
+  });
+
+
+  describe('a11y', function() {
+
+    it('should have no violations', async function() {
+
+      // given
+      const diagramXml = require('test/fixtures/a11y.bpmn').default;
+
+      // (1) ensure fully opened properties panel
+      let modeler;
+      await act(async () => {
+        const result = await createModeler(
+          diagramXml,
+          {
+            additionalModules: [
+              CamundaModdleExtension,
+              BpmnPropertiesPanel,
+              BpmnPropertiesProvider,
+              CamundaPropertiesProvider
+            ],
+            moddleExtensions: {
+              camunda: CamundaModdle
+            },
+            layout: {
+              groups: {
+                'general': { open: true },
+                'documentation': { open: true },
+                'multiInstance': { open: true },
+                'CamundaPlatform__Implementation': { open: true },
+                'CamundaPlatform__AsynchronousContinuations': { open: true },
+                'CamundaPlatform__JobExecution': { open: true },
+                'CamundaPlatform__Input': { open: true },
+                'CamundaPlatform__Output': { open: true },
+                'CamundaPlatform__ConnectorInput': { open: true },
+                'CamundaPlatform__ConnectorOutput': { open: true },
+                'CamundaPlatform__ExecutionListener': { open: true },
+                'CamundaPlatform__ExtensionProperties': { open: true },
+                'CamundaPlatform__FieldInjection': { open: true }
+              }
+            }
+          }
+        );
+        modeler = result.modeler;
+      });
+
+      const selection = modeler.get('selection');
+      const elementRegistry = modeler.get('elementRegistry');
+
+      await act(() => selection.select(elementRegistry.get('ServiceTask_1')));
+
+      // (2) open nested lists
+      const input1 = domQuery('[data-entry-id="ServiceTask_1-inputParameter-0"]', propertiesContainer);
+      const inputHeader = domQuery('.bio-properties-panel-collapsible-entry-header', input1);
+      const inputMapHeader = domQuery('.bio-properties-panel-list-entry-header', input1);
+      const entry = domQuery('[data-entry-id="ServiceTask_1-inputParameter-0-mapEntry-0"]', input1);
+      const entryHeader = domQuery('.bio-properties-panel-collapsible-entry-header', entry);
+
+      await act(() => {
+        inputHeader.click();
+        inputMapHeader.click();
+        entryHeader.click();
+      });
+
+      // when
+      const a11yResults = await axe.run(propertiesContainer, {
+        runOnly: [ 'best-practice', 'wcag2a', 'wcag2aa' ]
+      });
+
+      console.log(a11yResults);
+
+      // then
+      expect(a11yResults.passes).to.be.not.empty;
+      expect(a11yResults.incomplete).to.be.empty;
+      expect(a11yResults.violations).to.be.empty;
     });
 
   });
