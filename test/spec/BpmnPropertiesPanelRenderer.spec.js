@@ -94,7 +94,17 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
       moddleExtensions,
       propertiesPanel: {
         parent: propertiesContainer,
-        description
+        description,
+        layout: {
+          entries: {
+            'name': {
+              open: true
+            },
+            'extensionElements.values.1.inputParameters.0.target': {
+              open: true
+            }
+          }
+        }
       },
       ...options
     });

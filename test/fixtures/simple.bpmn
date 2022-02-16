@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1oiaibi" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0-alpha.1" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="1.3.0">
-  <bpmn:process id="Process_1" isExecutable="true">
-    <bpmn:serviceTask id="ServiceTask_1" name="Job Worker" />
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0zd4udw" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.0.0-alpha.1" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="1.3.0">
+  <bpmn:process id="Process_1r99vrt" isExecutable="false">
+    <bpmn:serviceTask id="ServiceTask_1" name="Job Worker">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="foo" retries="123" />
+        <zeebe:ioMapping>
+          <zeebe:input source="= source" target="InputVariable_1" />
+          <zeebe:input source="= source" target="InputVariable_2" />
+          <zeebe:output source="= source" target="OutputVariable_1" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="foo" value="1" />
+          <zeebe:header key="bar" value="2" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
-      <bpmndi:BPMNShape id="Activity_19za818_di" bpmnElement="ServiceTask_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1r99vrt">
+      <bpmndi:BPMNShape id="Activity_0cez06j_di" bpmnElement="ServiceTask_1">
         <dc:Bounds x="160" y="80" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>

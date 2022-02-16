@@ -35,7 +35,7 @@ export function NameProps(props) {
     {
       id: 'name',
       type: 'name',
-      component: <Name element={ element } />,
+      component: (props) => <Name element={ element } { ...props } />,
       isEdited: isTextFieldEntryEdited
     }
   ];
@@ -43,7 +43,8 @@ export function NameProps(props) {
 
 function Name(props) {
   const {
-    element
+    element,
+    onOpen
   } = props;
 
   const modeling = useService('modeling');
@@ -113,7 +114,7 @@ function Name(props) {
   }
 
 
-  return <TextFieldEntry { ...textFieldEntryProps } />;
+  return <TextFieldEntry { ...textFieldEntryProps } onOpen={ onOpen } />;
 }
 
 

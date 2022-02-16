@@ -71,7 +71,8 @@ function TargetProperty(props) {
     label: translate((is(parameter, 'zeebe:Input') ? 'Local variable name' : 'Process variable name')),
     getValue,
     setValue,
-    debounce
+    debounce,
+    onOpen
   });
 }
 
@@ -112,6 +113,7 @@ function SourceProperty(props) {
     label: translate('Variable assignment value'),
     getValue,
     setValue,
-    debounce
+    debounce,
+    onOpen
   });
 }
