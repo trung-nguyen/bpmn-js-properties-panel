@@ -37,3 +37,17 @@ html, body, .modeler-container, .modeler-container > div {
 .properties-container .bio-properties-panel {
   --font-family: 'IBM Plex Sans', sans-serif !important;
 }
+
+#tooltip {
+  background-color: hsl(205, 100%, 45%);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 2px;
+  font-size: 14px;
+  font-family: 'IBM Plex Sans', sans-serif !important;
+}
+
+#tooltip td:first-child {
+  font-weight: bold;
+  padding-right: 10px;
+}

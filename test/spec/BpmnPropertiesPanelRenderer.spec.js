@@ -1,3 +1,7 @@
+import Delegate from 'ftdomdelegate';
+
+import { createPopper } from '@popperjs/core';
+
 import TestContainer from 'mocha-test-container-support';
 
 import {
@@ -113,6 +117,67 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
 
   (singleStart === 'cloud' ? it.only : it)('should import simple process (cloud)', async function() {
 
+    const debug = false;
+
+    const delegate = new Delegate(document.body);
+
+    let tooltip;
+
+    let target;
+
+    let popperInstance;
+
+    const createTooltip = (event) => {
+      if (event) {
+        target = event.target;
+      } else {
+        event = { target };
+      }
+
+      tooltip = domify(`
+        <div id="tooltip" data-show>
+          <table>
+            <tbody>
+              <tr>
+                <td>ID</td>
+                <td>${ event.target.closest('.bio-properties-panel-entry').dataset.entryId }</td>
+              </tr>
+              <tr>
+                <td>Type</td>
+                <td>${ event.target.closest('.bio-properties-panel-entry').dataset.entryType }</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `);
+
+      document.body.appendChild(tooltip);
+
+      popperInstance = createPopper(target, tooltip, {
+        placement: 'left',
+        modifiers: [
+          {
+            name: 'offset',
+            options: {
+              offset: [ 0, 7 ]
+            },
+          },
+        ],
+      });
+    };
+
+    debug && delegate.on('mouseover', 'input, textarea', createTooltip);
+
+    const destroyTooltip = () => {
+      tooltip.remove();
+
+      tooltip = null;
+
+      popperInstance.destroy();
+    };
+
+    debug && delegate.on('mouseout', 'input, textarea', destroyTooltip);
+
     // given
     const diagramXml = require('test/fixtures/simple.bpmn').default;
 
@@ -132,6 +197,13 @@ describe('<BpmnPropertiesPanelRenderer>', function() {
         description: DescriptionProvider
       }
     );
+
+    debug && result.modeler.on('elements.changed', () => {
+      tooltip && setTimeout(() => {
+        destroyTooltip();
+        createTooltip();
+      }, 1);
+    });
 
     // then
     expect(result.error).not.to.exist;
