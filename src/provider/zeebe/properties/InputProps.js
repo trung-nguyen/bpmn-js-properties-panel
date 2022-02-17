@@ -31,7 +31,7 @@ export function InputProps({ element, injector }) {
         commandStack = injector.get('commandStack');
 
   const items = inputParameters.map((parameter, index) => {
-    const id = element.id + '-input-' + index;
+    const id = `input-${ index }`;
 
     return {
       id,

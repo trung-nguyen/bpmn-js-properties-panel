@@ -1,24 +1,29 @@
 import { TextFieldEntry } from '@bpmn-io/properties-panel';
 
+import { getBusinessObject } from 'bpmn-js/lib/util/ModelUtil';
+
 import {
   useService
 } from '../../../hooks';
 
+import { getPath, pathStringify } from '../../../utils/IdsUtil';
 
 export default function Header(props) {
 
   const {
-    idPrefix,
     element,
-    header
+    header,
+    idPrefix
   } = props;
 
   const entries = [ {
-    id: idPrefix + '-key',
-    component: <KeyProperty idPrefix={ idPrefix } element={ element } header={ header } />
+    id: `${ idPrefix }-key`,
+    type: 'header-key',
+    component: <KeyProperty element={ element } header={ header } />
   },{
-    id: idPrefix + '-value',
-    component: <ValueProperty idPrefix={ idPrefix } element={ element } header={ header } />
+    id: `${ idPrefix }-value`,
+    type: 'header-value',
+    component: <ValueProperty element={ element } header={ header } />
   } ];
 
   return entries;
@@ -26,10 +31,11 @@ export default function Header(props) {
 
 function KeyProperty(props) {
   const {
-    idPrefix,
     element,
     header
   } = props;
+
+  const businessObject = getBusinessObject(element);
 
   const commandStack = useService('commandStack');
   const translate = useService('translate');
@@ -49,22 +55,26 @@ function KeyProperty(props) {
     return header.key;
   };
 
-  return TextFieldEntry({
-    element: header,
-    id: idPrefix + '-key',
-    label: translate('Key'),
-    getValue,
-    setValue,
-    debounce
-  });
+  const path = header && getPath(header, businessObject);
+
+  return <TextFieldEntry
+    element={ header }
+    id={ pathStringify([ ...path, 'key' ]) }
+    type="header-key"
+    label={ translate('Key') }
+    getValue={ getValue }
+    setValue={ setValue }
+    debounce={ debounce }
+  />;
 }
 
 function ValueProperty(props) {
   const {
-    idPrefix,
     element,
     header
   } = props;
+
+  const businessObject = getBusinessObject(element);
 
   const commandStack = useService('commandStack');
   const translate = useService('translate');
@@ -84,12 +94,15 @@ function ValueProperty(props) {
     return header.value;
   };
 
-  return TextFieldEntry({
-    element: header,
-    id: idPrefix + '-value',
-    label: translate('Value'),
-    getValue,
-    setValue,
-    debounce
-  });
+  const path = header && getPath(header, businessObject);
+
+  return <TextFieldEntry
+    element={ header }
+    id={ pathStringify([ ...path, 'value' ]) }
+    type="header-value"
+    label={ translate('Value') }
+    getValue={ getValue }
+    setValue={ setValue }
+    debounce={ debounce }
+  />;
 }

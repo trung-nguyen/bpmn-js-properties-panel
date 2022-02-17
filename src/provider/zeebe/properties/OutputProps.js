@@ -31,7 +31,7 @@ export function OutputProps({ element, injector }) {
         commandStack = injector.get('commandStack');
 
   const items = outputParameters.map((parameter, index) => {
-    const id = element.id + '-output-' + index;
+    const id = `output-${ index }`;
 
     return {
       id,

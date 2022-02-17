@@ -34,6 +34,7 @@ export function NameProps(props) {
   return [
     {
       id: 'name',
+      type: 'name',
       component: <Name element={ element } />,
       isEdited: isTextFieldEntryEdited
     }
@@ -52,9 +53,10 @@ function Name(props) {
   const translate = useService('translate');
 
   // (1) default: name
-  let options = {
+  let textFieldEntryProps = {
     element,
     id: 'name',
+    type: 'name',
     label: translate('Name'),
     debounce,
     setValue: (value) => {
@@ -69,8 +71,8 @@ function Name(props) {
 
   // (2) text annotations
   if (is(element, 'bpmn:TextAnnotation')) {
-    options = {
-      ...options,
+    textFieldEntryProps = {
+      ...textFieldEntryProps,
       setValue: (value) => {
         modeling.updateProperties(element, {
           text: value
@@ -84,8 +86,8 @@ function Name(props) {
 
   // (3) groups
   else if (is(element, 'bpmn:Group')) {
-    options = {
-      ...options,
+    textFieldEntryProps = {
+      ...textFieldEntryProps,
       setValue: (value) => {
         const businessObject = getBusinessObject(element),
               categoryValueRef = businessObject.categoryValueRef;
@@ -107,11 +109,11 @@ function Name(props) {
 
   // (4) participants (only update label)
   else if (is(element, 'bpmn:Participant')) {
-    options.label = translate('Participant Name');
+    textFieldEntryProps.label = translate('Participant Name');
   }
 
 
-  return TextFieldEntry(options);
+  return <TextFieldEntry { ...textFieldEntryProps } />;
 }
 
 

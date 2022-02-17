@@ -20,6 +20,8 @@ import {
   isZeebeServiceTask
 } from '../utils/ZeebeServiceTaskUtil';
 
+import { getPath, pathStringify } from '../../../utils/IdsUtil';
+
 
 export function TaskDefinitionProps(props) {
   const {
@@ -32,12 +34,12 @@ export function TaskDefinitionProps(props) {
 
   return [
     {
-      id: 'taskDefinitionType',
+      id: 'task-definition-type',
       component: <TaskDefinitionType element={ element } />,
       isEdited: isTextFieldEntryEdited
     },
     {
-      id: 'taskDefinitionRetries',
+      id: 'task-definition-retries',
       component: <TaskDefinitionRetries element={ element } />,
       isEdited: isTextFieldEntryEdited
     }
@@ -48,6 +50,8 @@ function TaskDefinitionType(props) {
   const {
     element
   } = props;
+
+  const businessObject = getBusinessObject(element);
 
   const commandStack = useService('commandStack');
   const bpmnFactory = useService('bpmnFactory');
@@ -121,9 +125,13 @@ function TaskDefinitionType(props) {
     commandStack.execute('properties-panel.multi-command-executor', commands);
   };
 
+  const taskDefinition = getTaskDefinition(element),
+        path = taskDefinition && getPath(taskDefinition, businessObject);
+
   return TextFieldEntry({
     element,
-    id: 'taskDefinitionType',
+    id: path ? pathStringify([ ...path, 'type' ]) : 'task-definition-type',
+    type: 'task-definition-type',
     label: translate('Type'),
     getValue,
     setValue,
@@ -135,6 +143,8 @@ function TaskDefinitionRetries(props) {
   const {
     element
   } = props;
+
+  const businessObject = getBusinessObject(element);
 
   const commandStack = useService('commandStack');
   const bpmnFactory = useService('bpmnFactory');
@@ -207,9 +217,13 @@ function TaskDefinitionRetries(props) {
     commandStack.execute('properties-panel.multi-command-executor', commands);
   };
 
+  const taskDefinition = getTaskDefinition(element),
+        path = taskDefinition && getPath(taskDefinition, businessObject);
+
   return TextFieldEntry({
     element,
-    id: 'taskDefinitionRetries',
+    id: path ? pathStringify([ ...path, 'retries' ]) : 'task-definition-retries',
+    type: 'task-definition-retries',
     label: translate('Retries'),
     getValue,
     setValue,

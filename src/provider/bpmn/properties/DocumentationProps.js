@@ -13,6 +13,7 @@ import {
 } from '../../../hooks';
 
 import { without } from 'min-dash';
+import { getPath, pathStringify } from '../../../utils/IdsUtil';
 
 const DOCUMENTATION_TEXT_FORMAT = 'text/plain';
 
@@ -32,6 +33,7 @@ export function DocumentationProps(props) {
   const entries = [
     {
       id: 'documentation',
+      type: 'documentation',
       component: <ElementDocumentationProperty element={ element } />,
       isEdited: isTextAreaEntryEdited
     }
@@ -39,7 +41,8 @@ export function DocumentationProps(props) {
 
   if (hasProcessRef(element)) {
     entries.push({
-      id: 'processDocumentation',
+      id: 'process-documentation',
+      type: 'process-documentation',
       component: <ProcessDocumentationProperty element={ element } />,
       isEdited: isTextAreaEntryEdited
     });
@@ -66,6 +69,7 @@ function ElementDocumentationProperty(props) {
   return TextAreaEntry({
     element,
     id: 'documentation',
+    type: 'documentation',
     label: translate('Element documentation'),
     getValue,
     setValue,
@@ -83,16 +87,20 @@ function ProcessDocumentationProperty(props) {
   const translate = useService('translate');
   const debounce = useService('debounceInput');
 
-  const processRef = getBusinessObject(element).processRef;
+  const businessObject = getBusinessObject(element);
+
+  const processRef = businessObject.get('processRef');
 
   const getValue = getDocumentation(processRef);
 
-  const setValue =
-    setDocumentation(element, processRef, bpmnFactory, commandStack);
+  const setValue = setDocumentation(element, processRef, bpmnFactory, commandStack);
+
+  const path = getPath(processRef, businessObject);
 
   return TextAreaEntry({
     element,
-    id: 'processDocumentation',
+    id: pathStringify([ ...path, 'documentation' ]),
+    type: 'documentation',
     label: translate('Process documentation'),
     getValue,
     setValue,

@@ -29,7 +29,7 @@ export function HeaderProps({ element, injector }) {
         commandStack = injector.get('commandStack');
 
   const items = headers.map((header, index) => {
-    const id = element.id + '-header-' + index;
+    const id = `header-${ index }`;
 
     return {
       id,
@@ -39,7 +39,7 @@ export function HeaderProps({ element, injector }) {
         element,
         header
       }),
-      autoFocusEntry: id + '-key',
+      autoFocusEntry: 'header-key',
       remove: removeFactory({ commandStack, element, header })
     };
   });

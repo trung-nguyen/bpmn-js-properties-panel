@@ -29,6 +29,7 @@ export function IdProps(props) {
   return [
     {
       id: 'id',
+      type: 'id',
       component: <Id element={ element } />,
       isEdited: isTextFieldEntryEdited
     }
@@ -63,6 +64,7 @@ function Id(props) {
   return TextFieldEntry({
     element,
     id: 'id',
+    type: 'id',
     label: translate(is(element, 'bpmn:Participant') ? 'Participant ID' : 'ID'),
     getValue,
     setValue,
