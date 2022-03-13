@@ -5,6 +5,10 @@ import {
 
 import { TextFieldEntry, isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
 
+import { useCallback } from '@bpmn-io/properties-panel/preact/hooks';
+
+import { pathEquals } from '@philippfromme/moddle-helpers';
+
 import {
   useService
 } from '../../../hooks';
@@ -33,7 +37,8 @@ export function IdProps() {
 
 function Id(props) {
   const {
-    element
+    element,
+    id
   } = props;
 
   const modeling = useService('modeling');
@@ -56,13 +61,20 @@ function Id(props) {
     return isIdValid(businessObject, value, translate);
   };
 
+  const businessObject = getBusinessObject(element);
+
+  const show = useCallback((event) => {
+    return event.id === businessObject.get('id') && event.path && pathEquals(event.path, [ 'id' ]);
+  }, [ businessObject ]);
+
   return TextFieldEntry({
     element,
-    id: 'id',
+    id,
     label: translate(is(element, 'bpmn:Participant') ? 'Participant ID' : 'ID'),
     getValue,
     setValue,
     debounce,
-    validate
+    validate,
+    show
   });
 }

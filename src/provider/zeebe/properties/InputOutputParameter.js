@@ -1,8 +1,16 @@
 import {
+  getBusinessObject,
   is
 } from 'bpmn-js/lib/util/ModelUtil';
 
 import { TextFieldEntry } from '@bpmn-io/properties-panel';
+
+import { useCallback } from '@bpmn-io/properties-panel/preact/hooks';
+
+import {
+  getPath,
+  pathStringify
+} from '@philippfromme/moddle-helpers';
 
 import {
   useService
@@ -19,12 +27,10 @@ export default function InputOutputParameter(props) {
   const entries = [ {
     id: idPrefix + '-target',
     component: TargetProperty,
-    idPrefix,
     parameter
   },{
     id: idPrefix + '-source',
     component: SourceProperty,
-    idPrefix,
     parameter
   } ];
 
@@ -33,8 +39,8 @@ export default function InputOutputParameter(props) {
 
 function TargetProperty(props) {
   const {
-    idPrefix,
     element,
+    id,
     parameter
   } = props;
 
@@ -56,20 +62,29 @@ function TargetProperty(props) {
     return parameter.target;
   };
 
+  const businessObject = getBusinessObject(element);
+
+  const show = useCallback((event) => {
+    return event.id === businessObject.get('id')
+      && event.path
+      && pathStringify(event.path) === pathStringify([ ...getPath(parameter, businessObject), 'target' ]);
+  }, [ businessObject, parameter ]);
+
   return TextFieldEntry({
     element: parameter,
-    id: idPrefix + '-target',
+    id,
     label: translate((is(parameter, 'zeebe:Input') ? 'Local variable name' : 'Process variable name')),
     getValue,
     setValue,
-    debounce
+    debounce,
+    show
   });
 }
 
 function SourceProperty(props) {
   const {
-    idPrefix,
     element,
+    id,
     parameter
   } = props;
 
@@ -91,12 +106,21 @@ function SourceProperty(props) {
     return parameter.source;
   };
 
+  const businessObject = getBusinessObject(element);
+
+  const show = useCallback((event) => {
+    return event.id === businessObject.get('id')
+      && event.path
+      && pathStringify(event.path) === pathStringify([ ...getPath(parameter, businessObject), 'source' ]);
+  }, [ businessObject, parameter ]);
+
   return TextFieldEntry({
     element: parameter,
-    id: idPrefix + '-source',
+    id,
     label: translate('Variable assignment value'),
     getValue,
     setValue,
-    debounce
+    debounce,
+    show
   });
 }

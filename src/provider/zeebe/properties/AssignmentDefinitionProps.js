@@ -5,6 +5,13 @@ import {
 
 import { TextFieldEntry, isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
 
+import { useCallback } from '@bpmn-io/properties-panel/preact/hooks';
+
+import {
+  getPath,
+  pathEquals
+} from '@philippfromme/moddle-helpers';
+
 import {
   getExtensionElementsList
 } from '../../../utils/ExtensionElementsUtil';
@@ -43,7 +50,8 @@ export function AssignmentDefinitionProps(props) {
 
 function Assignee(props) {
   const {
-    element
+    element,
+    id
   } = props;
 
   const commandStack = useService('commandStack');
@@ -118,19 +126,31 @@ function Assignee(props) {
     commandStack.execute('properties-panel.multi-command-executor', commands);
   };
 
+  const businessObject = getBusinessObject(element),
+        assignmentDefinition = getAssignmentDefinition(element);
+
+  const show = useCallback((event) => {
+    return event.id === businessObject.get('id')
+      && event.path
+      && assignmentDefinition
+      && pathEquals(event.path, [ ...getPath(assignmentDefinition, businessObject), 'assignee' ]);
+  }, [ assignmentDefinition, businessObject ]);
+
   return TextFieldEntry({
     element,
-    id: 'assignmentDefinitionAssignee',
+    id,
     label: translate('Assignee'),
     getValue,
     setValue,
-    debounce
+    debounce,
+    show
   });
 }
 
 function CandidateGroups(props) {
   const {
-    element
+    element,
+    id
   } = props;
 
   const commandStack = useService('commandStack');
@@ -204,13 +224,24 @@ function CandidateGroups(props) {
     commandStack.execute('properties-panel.multi-command-executor', commands);
   };
 
+  const businessObject = getBusinessObject(element),
+        assignmentDefinition = getAssignmentDefinition(element);
+
+  const show = useCallback((event) => {
+    return event.id === businessObject.get('id')
+      && event.path
+      && assignmentDefinition
+      && pathEquals(event.path, [ ...getPath(assignmentDefinition, businessObject), 'candidateGroups' ]);
+  }, [ assignmentDefinition, businessObject ]);
+
   return TextFieldEntry({
     element,
-    id: 'assignmentDefinitionCandidateGroups',
+    id,
     label: translate('Candidate groups'),
     getValue,
     setValue,
-    debounce
+    debounce,
+    show
   });
 }
 

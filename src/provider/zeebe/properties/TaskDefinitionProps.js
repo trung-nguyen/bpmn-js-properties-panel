@@ -4,6 +4,13 @@ import {
 
 import { TextFieldEntry, isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
 
+import { useCallback } from '@bpmn-io/properties-panel/preact/hooks';
+
+import {
+  getPath,
+  pathEquals
+} from '@philippfromme/moddle-helpers';
+
 import {
   getExtensionElementsList
 } from '../../../utils/ExtensionElementsUtil';
@@ -46,7 +53,8 @@ export function TaskDefinitionProps(props) {
 
 function TaskDefinitionType(props) {
   const {
-    element
+    element,
+    id
   } = props;
 
   const commandStack = useService('commandStack');
@@ -121,19 +129,31 @@ function TaskDefinitionType(props) {
     commandStack.execute('properties-panel.multi-command-executor', commands);
   };
 
+  const businessObject = getBusinessObject(element),
+        taskDefinition = getTaskDefinition(element);
+
+  const show = useCallback((event) => {
+    return event.id === businessObject.get('id')
+      && event.path
+      && taskDefinition
+      && pathEquals(event.path, [ ...getPath(taskDefinition, businessObject), 'type' ]);
+  }, [ businessObject, taskDefinition ]);
+
   return TextFieldEntry({
     element,
-    id: 'taskDefinitionType',
+    id,
     label: translate('Type'),
     getValue,
     setValue,
-    debounce
+    debounce,
+    show
   });
 }
 
 function TaskDefinitionRetries(props) {
   const {
-    element
+    element,
+    id
   } = props;
 
   const commandStack = useService('commandStack');
@@ -207,13 +227,24 @@ function TaskDefinitionRetries(props) {
     commandStack.execute('properties-panel.multi-command-executor', commands);
   };
 
+  const businessObject = getBusinessObject(element),
+        taskDefinition = getTaskDefinition(element);
+
+  const show = useCallback((event) => {
+    return event.id === businessObject.get('id')
+      && event.path
+      && taskDefinition
+      && pathEquals(event.path, [ ...getPath(taskDefinition, businessObject), 'retries' ]);
+  }, [ businessObject, taskDefinition ]);
+
   return TextFieldEntry({
     element,
-    id: 'taskDefinitionRetries',
+    id,
     label: translate('Retries'),
     getValue,
     setValue,
-    debounce
+    debounce,
+    show
   });
 }
 

@@ -11,6 +11,10 @@ import {
 
 import { TextFieldEntry, isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
 
+import { useCallback } from '@bpmn-io/properties-panel/preact/hooks';
+
+import { pathEquals } from '@philippfromme/moddle-helpers';
+
 import {
   useService
 } from '../../../hooks';
@@ -42,7 +46,8 @@ export function NameProps(props) {
 
 function Name(props) {
   const {
-    element
+    element,
+    id
   } = props;
 
   const modeling = useService('modeling');
@@ -51,10 +56,16 @@ function Name(props) {
   const bpmnFactory = useService('bpmnFactory');
   const translate = useService('translate');
 
+  const businessObject = getBusinessObject(element);
+
+  const show = useCallback((event) => {
+    return event.id === businessObject.get('id') && event.path && pathEquals(event.path, [ 'name' ]);
+  }, [ businessObject ]);
+
   // (1) default: name
   let options = {
     element,
-    id: 'name',
+    id,
     label: translate('Name'),
     debounce,
     setValue: (value) => {
@@ -64,7 +75,8 @@ function Name(props) {
     },
     getValue: (element) => {
       return element.businessObject.name;
-    }
+    },
+    show
   };
 
   // (2) text annotations

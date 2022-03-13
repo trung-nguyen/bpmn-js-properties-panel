@@ -3,6 +3,15 @@ import {
   is
 } from 'bpmn-js/lib/util/ModelUtil';
 
+import { TextFieldEntry, isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
+
+import { useCallback } from '@bpmn-io/properties-panel/preact/hooks';
+
+import {
+  getPath,
+  pathEquals
+} from '@philippfromme/moddle-helpers';
+
 import {
   createElement
 } from '../../../utils/ElementUtil';
@@ -15,8 +24,6 @@ import {
 import {
   useService
 } from '../../../hooks';
-
-import { TextFieldEntry, isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
 
 
 export function TargetProps(props) {
@@ -39,7 +46,8 @@ export function TargetProps(props) {
 
 function TargetProcessId(props) {
   const {
-    element
+    element,
+    id
   } = props;
 
   const commandStack = useService('commandStack'),
@@ -116,12 +124,23 @@ function TargetProcessId(props) {
     commandStack.execute('properties-panel.multi-command-executor', commands);
   };
 
+  const businessObject = getBusinessObject(element),
+        calledElement = getCalledElement(element);
+
+  const show = useCallback((event) => {
+    return event.id === businessObject.get('id')
+      && event.path
+      && calledElement
+      && pathEquals(event.path, [ ...getPath(calledElement, businessObject), 'processId' ]);
+  }, [ businessObject, calledElement ]);
+
   return TextFieldEntry({
     element,
-    id: 'targetProcessId',
+    id,
     label: translate('Process ID'),
     getValue,
     setValue,
-    debounce
+    debounce,
+    show
   });
 }

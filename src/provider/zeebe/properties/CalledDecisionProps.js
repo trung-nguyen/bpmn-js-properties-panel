@@ -5,6 +5,13 @@ import {
 
 import { TextFieldEntry, isTextFieldEntryEdited } from '@bpmn-io/properties-panel';
 
+import { useCallback } from '@bpmn-io/properties-panel/preact/hooks';
+
+import {
+  getPath,
+  pathEquals
+} from '@philippfromme/moddle-helpers';
+
 import {
   getExtensionElementsList
 } from '../../../utils/ExtensionElementsUtil';
@@ -49,7 +56,8 @@ export function CalledDecisionProps(props) {
 
 function DecisionID(props) {
   const {
-    element
+    element,
+    id
   } = props;
 
   const commandStack = useService('commandStack');
@@ -124,19 +132,31 @@ function DecisionID(props) {
     commandStack.execute('properties-panel.multi-command-executor', commands);
   };
 
+  const businessObject = getBusinessObject(element),
+        calledDecision = getCalledDecision(element);
+
+  const show = useCallback((event) => {
+    return event.id === businessObject.get('id')
+      && event.path
+      && calledDecision
+      && pathEquals(event.path, [ ...getPath(calledDecision, businessObject), 'decisionId' ]);
+  }, [ businessObject, calledDecision ]);
+
   return TextFieldEntry({
     element,
-    id: 'decisionId',
+    id,
     label: translate('ID'),
     getValue,
     setValue,
-    debounce
+    debounce,
+    show
   });
 }
 
 function ResultVariable(props) {
   const {
-    element
+    element,
+    id
   } = props;
 
   const commandStack = useService('commandStack');
@@ -211,13 +231,24 @@ function ResultVariable(props) {
     commandStack.execute('properties-panel.multi-command-executor', commands);
   };
 
+  const businessObject = getBusinessObject(element),
+        calledDecision = getCalledDecision(element);
+
+  const show = useCallback((event) => {
+    return event.id === businessObject.get('id')
+      && event.path
+      && calledDecision
+      && pathEquals(event.path, [ ...getPath(calledDecision, businessObject), 'resultVariable' ]);
+  }, [ businessObject, calledDecision ]);
+
   return TextFieldEntry({
     element,
-    id: 'resultVariable',
+    id,
     label: translate('Result variable'),
     getValue,
     setValue,
-    debounce
+    debounce,
+    show
   });
 }
 

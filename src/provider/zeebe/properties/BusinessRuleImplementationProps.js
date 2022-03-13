@@ -8,6 +8,8 @@ import {
 
 import { SelectEntry } from '@bpmn-io/properties-panel';
 
+import { useCallback } from '@bpmn-io/properties-panel/preact/hooks';
+
 import {
   getExtensionElementsList
 } from '../../../utils/ExtensionElementsUtil';
@@ -47,7 +49,8 @@ export function BusinessRuleImplementationProps(props) {
 
 function BusinessRuleImplementation(props) {
   const {
-    element
+    element,
+    id
   } = props;
 
   const commandStack = useService('commandStack');
@@ -107,13 +110,28 @@ function BusinessRuleImplementation(props) {
     return options;
   };
 
+  const show = useCallback((event) => {
+    const { options = {} } = event;
+
+    const {
+      type,
+      missingExtensionElementType
+    } = options;
+
+    return type === 'missingExtensionElement' && [
+      'zeebe:CalledDecision',
+      'zeebe:TaskDefinition'
+    ].includes(missingExtensionElementType);
+  }, []);
+
   return SelectEntry({
     element,
-    id: 'businessRuleImplementation',
+    id,
     label: translate('Implementation'),
     getValue,
     setValue,
-    getOptions
+    getOptions,
+    show
   });
 }
 
