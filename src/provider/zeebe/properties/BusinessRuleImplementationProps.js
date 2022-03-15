@@ -9,7 +9,7 @@ import {
 import { SelectEntry } from '@bpmn-io/properties-panel';
 
 import {
-  getExtensionElementsList
+  getExtensionElementsList, removeExtensionElements
 } from '../../../utils/ExtensionElementsUtil';
 
 import {
@@ -76,6 +76,9 @@ function BusinessRuleImplementation(props) {
 
     let extensionElement, extensionElementType;
 
+    resetElement(element, commandStack);
+
+
     if (value === DMN_IMPLEMENTATION_OPTION) {
       extensionElement = getCalledDecision(element);
       extensionElementType = 'zeebe:CalledDecision';
@@ -84,7 +87,7 @@ function BusinessRuleImplementation(props) {
       extensionElementType = 'zeebe:TaskDefinition';
     }
 
-    if (!extensionElement) {
+    if (!extensionElement && extensionElementType) {
       extensionElement = createElement(
         extensionElementType,
         { },
@@ -134,4 +137,18 @@ function getCalledDecision(element) {
 
 function isBusinessRuleImplementationEdited(element) {
   return getTaskDefinition(element);
+}
+
+function resetElement(element, commandStack) {
+  const businessObject = getBusinessObject(element);
+  const taskDefintion = getTaskDefinition(element);
+  const calledDecision = getCalledDecision(element);
+
+  if (taskDefintion) {
+    removeExtensionElements(element, businessObject, taskDefintion, commandStack);
+  }
+
+  if (calledDecision) {
+    removeExtensionElements(element, businessObject, calledDecision, commandStack);
+  }
 }
